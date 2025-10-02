@@ -1,0 +1,74 @@
+resources:
+  - type: ServerGroup
+    server_name_prefix: "${name}"
+    zone: "${zone}"
+
+    parent:
+      type: LoadBalancer
+      selector: "${lb_name}"
+
+    min_size: 2
+    max_size: 5
+
+    setup_grace_period: 30
+    shutdown_force: false
+
+    template:
+      tags: [%{ for i, tag in tags ~}"${tag}"%{ if i < length(tags) - 1 }, %{ endif }%{ endfor ~}]
+      plan:
+        core: 2
+        memory: 4
+
+      network_interfaces:
+        - upstream:
+            names: ["${switch}"]
+          assign_cidr_block: "${assign_cidr_block}"
+          assign_netmask_len: ${assign_netmask_len}
+          default_route: "${defaultgateway}"
+          expose:
+            ports: [80]
+            vips: ["${vip1}"]
+            health_check:
+              protocol: "http"
+              path: "/"
+              status_code: 200
+
+      disks:
+        - os_type: "${os_name}"
+          plan: "${plan}"
+          connection: "${connector}"
+          size: ${size}
+
+      # 1番目のディスクの対するパラメータ(対応しているアーカイブの場合のみ指定可能)
+      edit_parameter:
+        disabled: false # ディスクの修正を行わない場合はtrue
+        password: ${password}
+        disable_pw_auth: ${disable_pw_auth}
+        ssh_keys:
+          - ${ssh_authorized_keys}
+        enable_dhcp: false
+        change_partition_uuid: true
+
+        # スタートアップスクリプト
+        # サーバのIPアドレス(共有セグメントの場合の自動割り当て)などを{{ .IPAddress}}のようなGoのテンプレートで利用可能
+        startup_scripts:
+          - |
+            #!/bin/bash
+            # @sacloud-once
+            sed -i "/iface lo inet loopback/a\    up   ip address add ${vip1} dev lo\n    down ip address del ${vip1} dev lo" /etc/network/interfaces
+            ifdown lo
+            ifup --force lo
+            echo "net.ipv4.conf.all.arp_ignore = 1" >> /etc/sysctl.conf
+            echo "net.ipv4.conf.all.arp_announce = 2" >> /etc/sysctl.conf
+            sysctl -p
+            #apt update
+            #apt -y upgrade
+            apt update
+            apt install nginx stress-ng -y
+            systemctl enable nginx
+            systemctl start nginx
+            hostname > /var/www/html/index.html
+
+# オートスケーラーの動作設定
+autoscaler:
+  cooldown: 300

@@ -1,0 +1,8 @@
+- name: WSL Ubuntu 24 setup
+  hosts: wsl_ubuntu_24
+  become: yes
+  vars_files:
+    - conf_ubuntu_24.yml
+  roles:
+    - common
+    - tools

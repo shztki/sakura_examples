@@ -1,0 +1,102 @@
+#cloud-config
+timezone: Asia/Tokyo
+# ホスト名上書き防止
+hostname: ${fqdn}
+fqdn: ${fqdn}
+preserve_hostname: false
+# SSH 公開鍵
+ssh_authorized_keys: 
+  - ${ssh_authorized_keys}
+# コンソール用パスワード（ハッシュ文字列OK）
+password: ${password}
+chpasswd: {expire: false}
+# apt パッケージ導入
+package_update: false
+package_upgrade: false
+packages: 
+  - nginx
+  - stress-ng
+bootcmd:
+  ## netplan を 99-netcfg.yaml に生成（50-cloud-init.yaml は残す）
+  - |
+    cat <<'EOF' > /etc/netplan/99-netcfg.yaml
+    network:
+      version: 2
+      renderer: networkd
+      ethernets:
+        ens3:
+          dhcp4: false
+          dhcp6: false
+          addresses:
+            - ${nic1ip}/${nic1cidr}
+          nameservers:
+            addresses:
+            - ${dns1}
+            - ${dns2}
+          routes:
+            - to: default
+              via: ${defaultgateway}
+    EOF
+    chmod 600 /etc/netplan/99-netcfg.yaml
+  ## --- 92: ens4 (private) ※GW/DNSなし（必要なら追記） ---
+  #- |
+  #  cat <<'EOF' > /etc/netplan/92-ens4.yaml
+  #  network:
+  #    version: 2
+  #    renderer: networkd
+  #    ethernets:
+  #      ens4:
+  #        dhcp4: false
+  #        dhcp6: false
+  #        addresses:
+  #          - ${nic2ip}/${nic2cidr}
+  #  EOF 
+  #  chmod 600 /etc/netplan/92-ens4.yaml
+  ## --- 92: ens4 (private) ※GW/DNSなし（静的ルートあり） ---
+  #- |
+  #  cat <<'EOF' > /etc/netplan/92-ens4.yaml
+  #  network:
+  #    version: 2
+  #    renderer: networkd
+  #    ethernets:
+  #      ens4:
+  #        dhcp4: false
+  #        dhcp6: false
+  #        addresses:
+  #          - ${nic2ip}/${nic2cidr}
+  #        routes:
+  #          - to: ${vpnnetwork}/${vpncidr}
+  #            via: ${vpnnexthop}
+  #  EOF 
+  #  chmod 600 /etc/netplan/92-ens4.yaml
+  ## --- 91: VIP on lo (/32) ---
+  - |
+    cat <<'EOF' > /etc/netplan/91-vip.yaml
+    network:
+      version: 2
+      renderer: networkd
+      ethernets:
+        lo:
+          match:
+            name: lo
+          addresses:
+            - ${vip1}/32
+    EOF
+    chmod 600 /etc/netplan/91-vip.yaml
+  ## DSR用sysctl
+  - printf "net.ipv4.conf.all.arp_ignore = 1\nnet.ipv4.conf.all.arp_announce = 2\n" > /etc/sysctl.d/99-loopback.conf
+  - sysctl --system || sysctl -p || true
+  # netplan
+  - netplan generate
+  - netplan apply
+  - sleep 3
+runcmd:
+  # NTP
+  - sed -i '/^#\\?NTP=/d' /etc/systemd/timesyncd.conf
+  - printf 'NTP=ntp1.sakura.ad.jp\\n' >> /etc/systemd/timesyncd.conf
+  - systemctl restart systemd-timesyncd.service || true
+  - timedatectl set-ntp true
+  # nginx
+  - systemctl enable --now nginx || true
+  - hostname > /var/www/html/index.html
+

@@ -1,0 +1,60 @@
+- name: apt update
+  apt:
+    update_cache: yes
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+    allow_unauthenticated: yes
+    autoremove: yes
+
+- name: Install Base Packages
+  apt:
+    name: "{{ apt.base }}"
+    state: present
+    allow_unauthenticated: yes
+    update_cache: yes
+
+- name: Terraform Install HashiCorp's GPG key.
+  shell: "wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --yes --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null"
+  become: true
+
+- name: Terrarom Verify the GPG key's fingerprint.
+  shell: "sudo gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint"
+  become: true
+
+- name: Terraform Add the official HashiCorp repository to your system.
+  shell: "echo \"deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main\" | sudo tee /etc/apt/sources.list.d/hashicorp.list"
+  become: true
+
+- name: Add Docker's official GPG key
+  shell: "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc"
+  become: true
+- file:
+    path: /etc/apt/keyrings/docker.asc
+    state: file
+    mode: 0644
+
+- name: Add Docker's repository to Apt sources
+  shell: "echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo \"${UBUNTU_CODENAME:-$VERSION_CODENAME}\") stable\" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null"
+  become: true
+- file:
+    path: /etc/apt/sources.list.d/docker.list
+    state: file
+    mode: 0644
+
+- name: Install Packages
+  apt:
+    name: "{{ apt.packages }}"
+    state: present
+    allow_unauthenticated: yes
+    update_cache: yes
+
+- name: Remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+

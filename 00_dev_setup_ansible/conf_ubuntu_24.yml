@@ -1,0 +1,21 @@
+apt:
+  base:
+    - gnupg
+    - software-properties-common
+    - ca-certificates
+    - curl
+    - unzip
+    - direnv
+    - jq
+    - pass
+    - tig
+    - whois
+    - wireguard-tools
+  packages:
+    - terraform
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+
