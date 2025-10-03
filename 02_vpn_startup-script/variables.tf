@@ -76,7 +76,7 @@ variable "disk04" {
 
 variable "server01" {
   default = {
-    os               = "alma_9_latest"
+    os               = "almalinux_9_latest"
     count            = 1
     core             = 2
     memory           = 4
@@ -91,7 +91,7 @@ variable "server01" {
 
 variable "server02" {
   default = {
-    os               = "rocky_9_latest"
+    os               = "rockylinux_9_latest"
     count            = 1
     core             = 2
     memory           = 4
