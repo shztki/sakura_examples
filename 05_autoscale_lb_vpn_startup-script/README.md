@@ -186,9 +186,20 @@ Error: creating SakuraCloud AutoScale is failed: Error in response: &iaas.APIErr
 ```
 
 * 上記のように挙動が怪しいため、本コード内ではアーカイブの指定方法を os_type にしています。  
-以下を参照したところ、最新の OS の記載がありませんでしたが、ちゃんと動作はしました。(アーカイブのリソースID を指定できるのが一番確実ですが、その方法は無いように見受けられます)  
+以下を参照したところ、最新の OS の記載がありませんでしたが、ちゃんと動作はしました。  
 https://docs.usacloud.jp/autoscaler/configuration/#resource_def_server_group  
 https://github.com/sacloud/iaas-api-go/blob/7cfcd90757d27993640bbc412e7e32526ba9218b/ostype/archive_ostype.go#L97  
+
+* なお以下のようにしてリソースID で指定することも可能ですが、パブリックアーカイブの場合は OS のバージョンがあがると更新されて無くなる可能性がありますし、自分で管理するゴールデンイメージもアップデートして変わる可能性もあると考えられるため、基本的には os_type や名前での指定をおすすめします。  
+```
+※autoscale.tf では以下のように指定
+    source_archive_id   = data.sakuracloud_archive.linux_archives[var.server01["os"]].id,
+
+※テンプレートファイル内では以下のように指定
+      disks:
+        - source_archive:
+            id: ${source_archive_id}
+```
 
 * 実運用を考えてオートスケールに耐えうる構成とする場合、起動テンプレートとなるゴールデンイメージの管理や(名前でしかアーカイブを指定できないため、他とプリフィックスが一致しないように注意)、ログ等の外部保存、ステートレスにするなど、システムの設計をよく検討する必要があります。  
 
