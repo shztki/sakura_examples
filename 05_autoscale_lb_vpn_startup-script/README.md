@@ -179,7 +179,7 @@ os_name             = data.sakuracloud_archive.linux_archives[var.server01["os"]
 ※plan実行時は以下
                   disks:
                     - source_archive:
-                        tags: ["os-linux", "alma-9-latest"]
+                        names: ["Ubuntu Server 24.04.2 LTS 64bit"]
 
 ※しかし、実行すると以下のエラーになり、正常に利用できない
 Error: creating SakuraCloud AutoScale is failed: Error in response: &iaas.APIErrorResponse{IsFatal:true, Serial:"71574d4b106424c1bec8fd5d2d9c6d7d", Status:"400 Bad Request", ErrorCode:"bad_request", ErrorMessage:"不適切な要求です。パラメータの指定誤り、入力規則違反です。入力内容をご確認ください。\nリクエストが不正です。1 error occurred:\n\t* resource=ServerGroup multiple source archive found with: {zone: tk1b, ID: , Names: [Ubuntu Server 24.04.2 LTS 64bit], Tags: []}, archives: [0xc0002672c0 0xc000267900]"}
