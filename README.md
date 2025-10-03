@@ -18,7 +18,7 @@ Windows11 で WSL を使い、Ubuntu24.04 の実行環境を整備する方法�
 * まずはターミナルということで、 Windows Terminal をインストールしてください。(Microsoft Store でインストール可能です)  
 https://learn.microsoft.com/ja-jp/windows/terminal/install  
 
-* 以下の情報などを参考に WSL やディストリビューションをインストールしてください。(Windows PorwerShell のコマンドラインでも、Microsoft Store でもインストール可能です)  
+* 以下の情報などを参考に WSL やディストリビューションをインストールしてください。(Windows PowerShell のコマンドラインでも、Microsoft Store でもインストール可能です)  
 https://learn.microsoft.com/ja-jp/windows/wsl/install  
 
 1. Windows Terminal を起動する。
@@ -289,7 +289,7 @@ https://manual.sakura.ad.jp/cloud/objectstorage/api.html
 
 
 ## メモ
-* Docker をユーザーで実行したい場合は、以下コマンドを実行した後、PorwerShell で `wsl --terminate My-DEV-Ubuntu-24.04` してターミナルにログインし直してください。  
+* Docker をユーザーで実行したい場合は、以下コマンドを実行した後、PowerShell で `wsl --terminate My-DEV-Ubuntu-24.04` してターミナルにログインし直してください。  
 ```
 $ sudo usermod -aG docker $USER
 ```
