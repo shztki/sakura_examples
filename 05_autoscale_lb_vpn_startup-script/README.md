@@ -21,7 +21,6 @@ https://manual.sakura.ad.jp/cloud/storage/modifydisk/windows.html
 <img src="img/example_04.jpg" width="600"> 
 
 ※variables.tf内の server01 変数内の count を変更することで初期配置台数を変更可能(その場合はオートスケールの min_size も変更すること)  
-※Ubuntu系のOSを利用する場合はサーバおよびオートスケールのテンプレートファイルを変更すること  
 
 
 ## サンプル見積もり
@@ -115,7 +114,7 @@ $ stress-ng --cpu 0 --cpu-load 100 --timeout 60m &
 	* autoscale01のfileを変更(RHEL系用、Ubuntu用、Debian用があります)
 
 * オートスケールで min_size を指定したとしても、存在しない場合に自動的に作成されることはありません。(発動はトリガーによります。手動でスケールアウトさせる場合は別です)  
-監視対象のサーバ名のプリフィックスと yaml 内で指定する `name (server_prefix_name)` を同一にするかどうかや、事前に別途最小数のサーバーを作成しておくのかによって、挙動にさまざまな差異が発生しますので、十分に注意して設計する必要があります。オートスケールで勝手に消されるなどの事故を防ぎたい場合は、ベースとなるサーバーは別途作成し、監視対象にはなるが、オートスケールの管理外となるようにする(オートスケール側の server_prefix_name を、`監視対象のプリフィックス文字列_XXXX` のようにする)、といった設計も考えられます。  
+監視対象のサーバ名のプリフィックスと yaml 内で指定する `name (server_prefix_name)` を同一にするかどうかや、事前に別途最小数のサーバーを作成しておくのかによって、挙動にさまざまな差異が発生しますので、十分に注意して設計する必要があります。オートスケールで勝手に消されるなどの事故を防ぎたい場合は、ベースとなるサーバーは別途作成し、監視対象にはなるが、オートスケールの管理外となるようにする(ベースとなるサーバーの名称は `監視対象のプリフィックス文字列-base-XXX` のようにし、オートスケール側の server_prefix_name を、`監視対象のプリフィックス文字列-scale-XXX` のようにする)、といった設計も考えられます。  
 
 * オートスケールの `type: "ServerGroup"` においては、plans は機能しないようです。  
 https://docs.usacloud.jp/autoscaler/configuration/#resource_def_server  
@@ -191,6 +190,8 @@ Error: creating SakuraCloud AutoScale is failed: Error in response: &iaas.APIErr
 以下を参照したところ、最新の OS の記載がありませんでしたが、ちゃんと動作はしました。(アーカイブのリソースID を指定できるのが一番確実ですが、その方法は無いように見受けられます)  
 https://docs.usacloud.jp/autoscaler/configuration/#resource_def_server_group  
 https://github.com/sacloud/iaas-api-go/blob/7cfcd90757d27993640bbc412e7e32526ba9218b/ostype/archive_ostype.go#L97  
+
+* 実運用を考えてオートスケールに耐えうる構成とする場合、起動テンプレートとなるゴールデンイメージの管理や(名前でしかアーカイブを指定できないため、他とプリフィックスが一致しないように注意)、ログ等の外部保存、ステートレスにするなど、システムの設計をよく検討する必要があります。  
 
 
 ## 参考

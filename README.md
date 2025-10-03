@@ -253,7 +253,7 @@ export TF_TOKEN_app_terraform_io=`pass terraform/cloud/token`
 ```
   #backend "s3" {
   #  bucket                      = "bucket-name"
-  #  key                         = "01_vpn_cloudinit/terraform.tfstate"
+  #  key                         = "01_vpn_cloud-init/terraform.tfstate"
   #  region                      = "jp-north-1"
   #  endpoint                    = "https://s3.isk01.sakurastorage.jp"
   #  skip_requesting_account_id  = true
