@@ -104,7 +104,7 @@ variable "vpn_router01" {
     vip                   = 254
     interface_ip1         = 253
     interface_ip2         = 252
-    vrid                  = 1
+    vrid                  = 254
     wire_guard_ip_address = "192.168.31.1/24"
     peer1_name            = "mypc"
     peer1_ip_address      = "192.168.31.11"
@@ -116,7 +116,7 @@ variable "lb01" {
     name          = "scaleout-lb"
     memo          = "example"
     plan          = "standard" # standard or highspec
-    vrid          = 2
+    vrid          = 250
     sorry_server  = ""
     vip1          = 250
     interface_ip1 = 249
