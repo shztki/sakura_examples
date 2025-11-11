@@ -24,6 +24,10 @@ resource "sakuracloud_server" "server01" {
     ssh_authorized_keys = sakuracloud_ssh_key.sshkey01.public_key,
     password            = var.default_password_hash,
     fqdn                = format("%s-%s-%03d", module.label.id, var.server01["name"], count.index + 1),
+    if1_name            = "eth0"
+    connection1_name    = "System eth0"
+    if2_name            = "eth1"
+    connection2_name    = "System eth1"
     ## private
     nic1ip         = cidrhost(var.switch01["name"], var.server01["start_ip"] + count.index),
     nic1cidr       = element(regex("^\\d+\\.\\d+\\.\\d+\\.\\d+/(\\d+)", var.switch01["name"]), 0),

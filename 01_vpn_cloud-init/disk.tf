@@ -5,6 +5,7 @@ resource "sakuracloud_disk" "disk01" {
   source_archive_id    = data.sakuracloud_archive.linux_cloud_init_archives[var.server01["os"]].id
   plan                 = var.disk01["plan"]
   encryption_algorithm = var.disk01["encryption_algorithm"]
+  kms_key_id           = sakuracloud_kms.kms01.id
   connector            = var.disk01["connector"]
   size                 = var.disk01["size"]
   tags                 = concat(var.tags, module.label.attributes)

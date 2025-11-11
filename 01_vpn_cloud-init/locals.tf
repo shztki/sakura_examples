@@ -57,6 +57,14 @@ locals {
         "distro-ver-9.6"
       ]
     }
+    alma_10_0 = {
+      tags = [
+        "os-linux",
+        "cloud-init",
+        "distro-alma",
+        "distro-ver-10.0"
+      ]
+    }
 
     rocky_8_9 = {
       tags = [
@@ -88,6 +96,14 @@ locals {
         "cloud-init",
         "distro-rocky",
         "distro-ver-9.6"
+      ]
+    }
+    rocky_10_0 = {
+      tags = [
+        "os-linux",
+        "cloud-init",
+        "distro-rocky",
+        "distro-ver-10.0"
       ]
     }
 

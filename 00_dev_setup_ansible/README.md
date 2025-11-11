@@ -16,6 +16,8 @@ $ cd ~/work/sakura_examples/00_dev_setup_ansible/
 $ ansible-playbook -i dev_hosts wsl_ubuntu_24.yml --ask-become-pass
 $ source ~/.bashrc
 ```
+* AWS CLI と usacloud については、コマンドの有無を確認し、無ければ初回インストール、あるとアップデートを実行するようにしています。このため、初回実行時は必ず failed に count されますが、skip して後続の処理を実行するようにしているため、問題ありません。
+* Ansibleは一度だけ実行するものではなく、何度実行されてもよいように、冪等性を意識する必要があります。本コードでは常にそのときの最新にアップデートされる、という同じ状態になるようにしてあるつもりです。
 
 
 ## 備考

@@ -5,6 +5,8 @@
 
 
 ## 注意事項
+* 2025/11/11 時点で、オートスケールではディスク暗号化には対応していません。
+
 * 2025/9/18 時点で、オートスケールは cloud-init には対応していません。 `cloud_config:` 内でオートスケールが割り当てた IPアドレスを取得することができないため、スイッチと接続するインターフェースへの静的なIPアドレス設定を行うことができません。  
 [マニュアル](https://docs.usacloud.jp/autoscaler/network/)にある、以下のような指定に対応しておらず、値が展開されないためのようです。  
 ```
@@ -27,6 +29,7 @@ https://manual.sakura.ad.jp/cloud/storage/modifydisk/windows.html
 [料金シミュレーション](https://cloud.sakura.ad.jp/payment/simulation/#/?state=e3N6OiJ0azFiIixzdDp7InVuaXQiOiJtb250aGx5IiwidmFsdWUiOjF9LHNpOiIiLGl0OntzZTpbe3A6OSxxOjIsZGk6W3twOjUscToyfV0sIm9zIjpudWxsLGxhOm51bGwsd2E6bnVsbCxpcGhvOmZhbHNlfV0sc3c6W3twOjEscToxfV0sdnA6W3twOjEscToxLHdhOm51bGx9XSwibGIiOlt7cDoxLHE6MSx3YTpudWxsfV19fQ==)  
 ※VPNルータ(スタンダード)とスイッチ、ロードバランサ(スタンダードシングル)、サーバ 2台としています  
 ※ロードバランサを冗長にしたい場合は、 `lb.tf` にて IPアドレスをふたつ指定して作成してください  
+※東京第2ゾーンでの例となっていますので、利用するゾーンにあわせて変更してください  
 
 
 ## 準備
@@ -143,6 +146,7 @@ https://docs.usacloud.jp/autoscaler/configuration/#resource_def_server
 
 * オートスケールでソースアーカイブ指定時に tags を利用しても正常に機能しないようです。以下のエラーになりました。  
 `source_archive:` では [<name_or_resource_selector>](https://docs.usacloud.jp/autoscaler/configuration/#resource_selector)のはずなので、tags も本来は機能するはずと思うのですが、不可でした。  
+`※2025/11/11 に確認したところ、修正されていたため、本コード内での指定方法はこちらにしています。`  
 
 ```
 ※autoscale.tf内で templatefile に以下を記載
@@ -152,6 +156,7 @@ os_tags             = local.linux_archives[var.server01["os"]].tags,
       disks:
         - source_archive:
             tags: [%{ for i, os_tag in os_tags ~}"${os_tag}"%{ if i < length(os_tags) - 1 }, %{ endif }%{ endfor ~}]
+        - os_type: "${os_name}"
 
 
 ※plan実行時は以下
@@ -185,10 +190,28 @@ os_name             = data.sakuracloud_archive.linux_archives[var.server01["os"]
 Error: creating SakuraCloud AutoScale is failed: Error in response: &iaas.APIErrorResponse{IsFatal:true, Serial:"71574d4b106424c1bec8fd5d2d9c6d7d", Status:"400 Bad Request", ErrorCode:"bad_request", ErrorMessage:"不適切な要求です。パラメータの指定誤り、入力規則違反です。入力内容をご確認ください。\nリクエストが不正です。1 error occurred:\n\t* resource=ServerGroup multiple source archive found with: {zone: tk1b, ID: , Names: [Ubuntu Server 24.04.2 LTS 64bit], Tags: []}, archives: [0xc0002672c0 0xc000267900]"}
 ```
 
-* 上記のように挙動が怪しいため、本コード内ではアーカイブの指定方法を os_type にしています。  
-以下を参照したところ、最新の OS の記載がありませんでしたが、ちゃんと動作はしました。  
+* アーカイブの指定方法には os_type を利用することも可能です。  
+os_type が存在するかは、以下を参照ください。  
 https://docs.usacloud.jp/autoscaler/configuration/#resource_def_server_group  
 https://github.com/sacloud/iaas-api-go/blob/7cfcd90757d27993640bbc412e7e32526ba9218b/ostype/archive_ostype.go#L97  
+`※2025/11/11 に確認したところ、Alma/Rocky Linux 10 はまだ対応していないようで、以下のエラーでしたが、いずれは対応するものと思われます。`  
+
+```
+※autoscale.tf内で templatefile に以下を記載
+ os_name             = replace(replace(var.server01["os"], "_latest", ""), "_", ""),
+ 
+※yaml内で以下を記載
+      disks:
+        - os_type: "${os_name}"
+
+※plan実行時は以下
+                  disks:
+                    - os_type: "almalinux10"
+
+
+※しかし、実行すると以下のエラーになり、正常に検索できていない
+Error: creating SakuraCloud AutoScale is failed: Error in response: &iaas.APIErrorResponse{IsFatal:true, Serial:"9402a09892844a1ebb1f8ab9e39808dc", Status:"400 Bad Request", ErrorCode:"bad_request", ErrorMessage:"不適切な要求です。パラメータの指定誤り、入力規則違反です。入力内容をご確認ください。\nリクエストが不正です。1 error occurred:\n\t* resource=ServerGroup unsupported ostype.ArchiveOSType: Custom"}
+```
 
 * なお以下のようにしてリソースID で指定することも可能ですが、パブリックアーカイブの場合は OS のバージョンがあがると更新されて無くなる可能性がありますし、自分で管理するゴールデンイメージもアップデートして変わる可能性もあると考えられるため、基本的には os_type や名前での指定をおすすめします。  
 ```

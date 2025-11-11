@@ -1,5 +1,5 @@
 variable "zone" {
-  default = "tk1b"
+  default = "is1c"
 }
 
 variable "default_password" {}
@@ -47,7 +47,7 @@ variable "disk01" {
 
 variable "server01" {
   default = {
-    os = "almalinux_9_latest"
+    os = "almalinux_10_latest"
     #os = "ubuntu_24_04_latest"
     #os               = "debian_12_latest"
     count            = 2

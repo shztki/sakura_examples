@@ -18,20 +18,18 @@ packages:
   - stress-ng
 # --- 起動後処理（順序が重要）---
 bootcmd: 
-  ## 静的IP/DNSを NetworkManager に適用（既存の System eth0 を直接更新）
-  - nmcli -t -f NAME con show | grep -qx 'System eth0' || nmcli con add type ethernet ifname eth0 con-name 'System eth0'
-  - nmcli con mod 'System eth0' ipv4.addresses '${nic1ip}/${nic1cidr}' ipv4.gateway '${defaultgateway}' ipv4.dns '${dns1}, ${dns2}' ipv4.method manual ipv6.method ignore
-  ## 反映（down→up が必要）
-  - nmcli con down 'System eth0' || true
-  - nmcli con up   'System eth0'
+  - nmcli -t -f NAME con show | grep -qx '${connection1_name}' || nmcli con add type ethernet ifname ${if1_name} con-name '${connection1_name}'
+  - nmcli con mod '${connection1_name}' ipv4.addresses '${nic1ip}/${nic1cidr}' ipv4.gateway '${defaultgateway}' ipv4.dns '${dns1}, ${dns2}' ipv4.method manual ipv6.method ignore
+  - nmcli con down '${connection1_name}' || true
+  - nmcli con up   '${connection1_name}'
   ## 2個めのインターフェース設定
-  #- nmcli -t -f NAME con show | grep -qx 'System eth1' || nmcli con add type ethernet ifname eth1 con-name 'System eth1'
-  #- nmcli con mod 'System eth1' ipv4.addresses '${nic2ip}/${nic2cidr}' ipv4.method manual ipv4.never-default yes ipv6.method ignore
+  #- nmcli -t -f NAME con show | grep -qx '${connection2_name}' || nmcli con add type ethernet ifname ${if2_name} con-name '${connection2_name}'
+  #- nmcli con mod '${connection2_name}' ipv4.addresses '${nic2ip}/${nic2cidr}' ipv4.method manual ipv4.never-default yes ipv6.method ignore
   ### --- System eth1 に永続ルートを追加（次ホップは switch02 の VIP） ---
-  #- nmcli con mod 'System eth1' +ipv4.routes '${vpnnetwork}/${vpncidr} ${vpnnexthop}'
+  #- nmcli con mod '${connection2_name}' +ipv4.routes '${vpnnetwork}/${vpncidr} ${vpnnexthop}'
   ### 反映（down→up が必要）
-  #- nmcli con down 'System eth1' || true
-  #- nmcli con up   'System eth1'
+  #- nmcli con down '${connection2_name}' || true
+  #- nmcli con up   '${connection2_name}'
   ## DSR: VIP を dummy インターフェースに付与
   - nmcli connection add type dummy ifname vip01 con-name vip01 ipv4.method manual ipv4.addresses '${vip1}/32' ipv6.method ignore
   ## DSR: ARP 抑制を sysctl に設定

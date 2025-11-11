@@ -73,6 +73,7 @@ $ pip install ansible
 
 * 最低限利用するツール類を自動でインストールします。  
 ansible のコードを用意していますので、手元にクローンして実行してください。  
+詳細は[こちらのREADME](https://github.com/shztki/sakura_examples/tree/main/00_dev_setup_ansible)も参照ください。  
 ```
 $ mkdir ~/work
 $ cd ~/work

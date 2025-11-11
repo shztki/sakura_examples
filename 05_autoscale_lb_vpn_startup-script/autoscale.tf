@@ -22,7 +22,7 @@ resource "sakuracloud_auto_scale" "lb_hscale01" {
     switch              = format("%s-%s", module.label.id, var.switch01["name"]),
     assign_cidr_block   = format("%s/%s", cidrhost(var.switch01["name"], var.server01["start_ip"] - 1), element(regex("^\\d+\\.\\d+\\.\\d+\\.\\d+/(\\d+)", var.switch01["name"]), 0)),
     assign_netmask_len  = element(regex("^\\d+\\.\\d+\\.\\d+\\.\\d+/(\\d+)", var.switch01["name"]), 0),
-    os_name             = replace(replace(var.server01["os"], "_latest", ""), "_", ""),
+    os_tags             = local.linux_archives[var.server01["os"]].tags,
     plan                = var.disk01["plan"],
     connector           = var.disk01["connector"],
     size                = var.disk01["size"],

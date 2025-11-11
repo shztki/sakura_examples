@@ -25,6 +25,12 @@ locals {
         "alma-9-latest"
       ]
     }
+    almalinux_10_latest = {
+      tags = [
+        "os-linux",
+        "alma-10-latest"
+      ]
+    }
 
     rockylinux_8_latest = {
       tags = [
@@ -36,6 +42,12 @@ locals {
       tags = [
         "os-linux",
         "rocky-9-latest"
+      ]
+    }
+    rockylinux_10_latest = {
+      tags = [
+        "os-linux",
+        "rocky-10-latest"
       ]
     }
 

@@ -1,5 +1,5 @@
 variable "zone" {
-  default = "tk1b"
+  default = "is1c"
 }
 
 variable "default_password" {}
@@ -39,7 +39,7 @@ variable "disk01" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -49,7 +49,7 @@ variable "disk02" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -59,7 +59,7 @@ variable "disk03" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -69,14 +69,14 @@ variable "disk04" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
 
 variable "server01" {
   default = {
-    os               = "almalinux_9_latest"
+    os               = "almalinux_10_latest"
     count            = 1
     core             = 2
     memory           = 4
@@ -91,7 +91,7 @@ variable "server01" {
 
 variable "server02" {
   default = {
-    os               = "rockylinux_9_latest"
+    os               = "rockylinux_10_latest"
     count            = 1
     core             = 2
     memory           = 4
@@ -107,7 +107,7 @@ variable "server02" {
 variable "server03" {
   default = {
     os               = "ubuntu_24_04_latest"
-    count            = 1
+    count            = 0
     core             = 2
     memory           = 4
     commitment       = "standard" # "dedicatedcpu"
@@ -122,7 +122,7 @@ variable "server03" {
 variable "server04" {
   default = {
     os               = "debian_12_latest"
-    count            = 1
+    count            = 0
     core             = 2
     memory           = 4
     commitment       = "standard" # "dedicatedcpu"
@@ -214,3 +214,12 @@ variable "filter01" {
     memo = "example"
   }
 }
+
+variable "kms01" {
+  default = {
+    name = "kms"
+    memo = "example"
+  }
+}
+
+

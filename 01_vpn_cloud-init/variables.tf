@@ -1,5 +1,5 @@
 variable "zone" {
-  default = "tk1b"
+  default = "is1c"
 }
 
 variable "default_password_hash" {}
@@ -39,7 +39,7 @@ variable "disk01" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -49,7 +49,7 @@ variable "disk02" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -59,7 +59,7 @@ variable "disk03" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -69,14 +69,14 @@ variable "disk04" {
     size                 = 20    # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
 
 variable "server01" {
   default = {
-    os               = "alma_9_6"
+    os               = "alma_10_0"
     count            = 1
     core             = 2
     memory           = 4
@@ -92,7 +92,7 @@ variable "server01" {
 
 variable "server02" {
   default = {
-    os               = "rocky_9_6"
+    os               = "rocky_10_0"
     count            = 1
     core             = 2
     memory           = 4
@@ -194,3 +194,11 @@ variable "filter01" {
     memo = "example"
   }
 }
+
+variable "kms01" {
+  default = {
+    name = "kms"
+    memo = "example"
+  }
+}
+

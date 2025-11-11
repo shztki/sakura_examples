@@ -7,14 +7,14 @@ Rocky/Alma/Ubuntu/Debian に対応しています。
 そのため、bootcmd や runcmd を駆使して設定する必要があります。  
 共有セグメントに接続する(DHCPでIPがもらえる)以外の環境では、設定に工夫が必要なので、そちらを盛り込んだものにしています。  
 以下が組み込まれています。  
-(最終的には templatefile を利用して動的に変更できる形にしていますが、コード内でyamlencodeして動的に作成するパターンも参考までにコメントアウトして残しています)  
+(最終的には templatefile を利用して動的に変更できる形にしていますが、コード内でyamlencodeして動的に作成するパターンも参考までにコメントアウトして残しています。ただ更新はしていないため、記載内容は過去の状態のままなので利用する場合は注意)  
 
 * SSH公開鍵設定
 * クラウドユーザーへのパスワード設定(SHA512)
 * パッケージアップデート、インストール
 * ホスト名設定
-* 1個目の NIC への静的IPアドレス設定(プライベートIPアドレス)
-* コメントアウト: 2個目の NIC への静的IPアドレス設定(プライベートIPアドレス)およびVPN先へのスタティックルート設定
+* 1個目の NIC への静的IPアドレス設定(rocky10だけ初期状態が異なるようなので注意。コネクション名が cloud-init ens3 で接続済み。もしかすると network-config に対応したのかもしれないが未確認)
+* コメントアウト: 2個目の NIC への静的IPアドレス設定およびVPN先へのスタティックルート設定(rocky10だけ初期状態が異なるようなので注意。コネクション名が cloud-init ens4 で接続済み。もしかすると network-config に対応したのかもしれないが未確認)
 * DSR型のLB利用時のためのVIP設定とカーネルパラメータ設定
 * NTP設定
 * タイムゾーン変更
@@ -22,13 +22,11 @@ Rocky/Alma/Ubuntu/Debian に対応しています。
 
 
 ## 注意事項
-* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではディスクの暗号化に対応できません。対応する場合、KMSキーを作成し、ディスクの暗号化を行う際に KMSキーのリソースIDを指定する、という処理が必要ですが、まだディスク側に指定方法が実装されていないようです。
-
 * 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。VPNルータで連携できるようになりましたが、VPNルータ側にもまだ指定方法が実装されていないようです。
 
 
 ## サンプル構成図
-<img src="img/example_01.jpg" width="600"> 
+<img src="img/example_01.jpg" width="600">  
 
 ※variables.tf内の server0X 変数内の count を 0～10 に変更することで、各OSを利用したサーバを何台作成するか指定可能  
 ※全OSを1台ずつ作成する場合は、server01～04 の count を 1 にする  
@@ -36,11 +34,13 @@ Rocky/Alma/Ubuntu/Debian に対応しています。
 
 ## サンプル見積もり
 [料金シミュレーション](https://cloud.sakura.ad.jp/payment/simulation/#/?state=e3N6OiJ0azFiIixzdDp7InVuaXQiOiJtb250aGx5IiwidmFsdWUiOjF9LHNpOiIiLGl0OntzZTpbe3A6OSxxOjEsZGk6W3twOjUscToxfV0sIm9zIjpudWxsLGxhOm51bGwsd2E6bnVsbCxpcGhvOmZhbHNlfV0sc3c6W3twOjEscToxfV0sdnA6W3twOjEscToxLHdhOm51bGx9XX19)  
-※VPNルータ(スタンダード)とスイッチが固定で、サーバはサンプルで1台分費用を入れています
+※VPNルータ(スタンダード)とスイッチが固定で、サーバはサンプルで1台分費用を入れています  
+※東京第2ゾーンでの例となっていますので、利用するゾーンにあわせて変更してください  
 
 
 ## 準備
 ひとつ上の階層の README に記載の `実行環境をセットアップする` を実施してください。  
+
 
 ## 利用方法
 * 以下を実行します。  
@@ -103,7 +103,7 @@ $ ssh -i ~/.ssh/id_rsa -p 10025 debian@VPNルータ作成後に出力される�
 
 ## 備考
 * 本コードでは、変数 `server01` の `os` に指定する文言と locals.tf 内の文言を合わせることで、指定したタグにマッチするアーカイブが利用されるようにしています。  
-(AlmaLinux8/9,RockyLinux8/9,Ubuntu22.04/24.04,Debian11/12)  
+(AlmaLinux8/9/10,RockyLinux8/9/10,Ubuntu22.04/24.04,Debian11/12)  
 usacloud CLI 導入済みであれば、以下コマンドで cloud-init対応の Linux のアーカイブとそのタグを確認することができます。  
 ```
 usacloud iaas archive ls --tags os-linux --tags cloud-init

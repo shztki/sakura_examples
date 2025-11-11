@@ -11,14 +11,12 @@ DNS や NTP はあらかじめ設定されています。
 * 指定の名前でのユーザー作成(パスワードとSSH公開鍵はデフォルトユーザーと同じにする)
 	* (ubuntuのみ)指定の名前が無い場合、ubuntu ユーザーの sudo用設定を実施
 * OSアップデート、パッケージインストール
-* 2個目の NIC への静的IPアドレス設定(プライベートIPアドレス)およびVPN先へのスタティックルート設定
+* 2個目の NIC への静的IPアドレス設定(プライベートIPアドレス)およびVPN先へのスタティックルート設定(alma10/rocky10は初期状態が異なるようなので注意。コネクション名が Wired connection 1 で接続済み)
 * DSR型のLB利用時のためのVIP設定とカーネルパラメータ設定
 * ドキュメントルートへのテキスト配置
 
 
 ## 注意事項
-* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではディスクの暗号化に対応できません。対応する場合、KMSキーを作成し、ディスクの暗号化を行う際に KMSキーのリソースIDを指定する、という処理が必要ですが、まだディスク側に指定方法が実装されていないようです。
-
 * 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。VPNルータで連携できるようになりましたが、VPNルータ側にもまだ指定方法が実装されていないようです。
 
 * Ubuntu では、ディスク修正機能により作成される `/etc/netplan/01-netcfg.yaml` のパーミッションが正しくない(600になっていない)ために、スタートアップスクリプトのログ(/root/.sacloud-api/notes/ID.log)には WARNING がでます。  
@@ -34,10 +32,12 @@ DNS や NTP はあらかじめ設定されています。
 ## サンプル見積もり
 [料金シミュレーション](https://cloud.sakura.ad.jp/payment/simulation/#/?state=e3N6OiJ0azFiIixzdDp7InVuaXQiOiJtb250aGx5IiwidmFsdWUiOjF9LHNpOiIiLGl0OntzZTpbe3A6OSxxOjEsZGk6W3twOjUscToxfV0sIm9zIjpudWxsLGxhOm51bGwsd2E6bnVsbCxpcGhvOmZhbHNlfV0sc3c6W3twOjEscToxfV0sdnA6W3twOjEscToxLHdhOm51bGx9XX19)  
 ※VPNルータ(スタンダード)とスイッチが固定で、サーバはサンプルで1台分費用を入れています
+※東京第2ゾーンでの例となっていますので、利用するゾーンにあわせて変更してください  
 
 
 ## 準備
 ひとつ上の階層の README に記載の `実行環境をセットアップする` を実施してください。  
+
 
 ## 利用方法
 * 以下を実行します。  
@@ -100,7 +100,7 @@ $ ssh -i ~/.ssh/id_rsa -p 10025 root@VPNルータ作成後に出力されるグ�
 
 ## 備考
 * 本コードでは、変数 `server01` の `os` に指定する文言と locals.tf 内の文言を合わせることで、指定したタグにマッチするアーカイブが利用されるようにしています。  
-(AlmaLinux8/9,RockyLinux8/9,Ubuntu22.04/24.04,Debian11/12)  
+(AlmaLinux8/9/10,RockyLinux8/9/10,Ubuntu22.04/24.04,Debian11/12)  
 usacloud CLI 導入済みであれば、以下コマンドのような形(latest対象のOS名とバージョン番号は適宜変更)で対象の Linux のアーカイブ情報を確認することができます。  
 ```
 usacloud iaas archive ls --tags os-linux --tags alma-9-latest

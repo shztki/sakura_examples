@@ -34,7 +34,8 @@ resources:
               status_code: 200
 
       disks:
-        - os_type: "${os_name}"
+        - source_archive:
+            tags: [%{ for i, os_tag in os_tags ~}"${os_tag}"%{ if i < length(os_tags) - 1 }, %{ endif }%{ endfor ~}]
           plan: "${plan}"
           connection: "${connector}"
           size: ${size}

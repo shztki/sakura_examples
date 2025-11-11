@@ -17,8 +17,8 @@ ROUTE1_NEXTHOP1=@@@route1_nexthop1@@@ # *.*.*.*
 LOOPBACK_IP=@@@loopback_ip@@@ 	# *.*.*.*
 UPDATE=@@@update@@@ 	      	# yes
 
-#-- 8/9系の OS は通信が可能になるまで少し時間がかかる
-if [ $(grep -c "release 8" /etc/redhat-release) -eq 1 ] || [ $(grep -c "release 9" /etc/redhat-release) -eq 1 ] ;then
+#-- 8/9/10系の OS は通信が可能になるまで少し時間がかかる
+if [ $(grep -c "release 8" /etc/redhat-release) -eq 1 ] || [ $(grep -c "release 9" /etc/redhat-release) -eq 1 ] || [ $(grep -c "release 10" /etc/redhat-release) -eq 1 ];then
 	sleep 10
 else
 	exit 0
@@ -43,11 +43,19 @@ function setup_eth1() {
   IP=$ETH1_IP
   if [ "$IP" == "" ]; then return 0; fi
   ip a s | grep -q $IP && return 0;
-  nmcli con mod "System eth1" \
-  ipv4.method manual \
-  ipv4.address $IP \
-  connection.autoconnect "yes" \
-  ipv6.method "disabled"
+  if [ $(grep -c "release 10" /etc/redhat-release) -eq 1 ];then
+    nmcli con mod "Wired connection 1" \
+    ipv4.method manual \
+    ipv4.address $IP \
+    connection.autoconnect "yes" \
+    ipv6.method "disabled"
+  else
+    nmcli con mod "System eth1" \
+    ipv4.method manual \
+    ipv4.address $IP \
+    connection.autoconnect "yes" \
+    ipv6.method "disabled"
+  fi
   if [ "$ROUTE1_CIDR1" != "" ]; then
     nmcli con mod "System eth1" +ipv4.routes "$ROUTE1_CIDR1 $ROUTE1_NEXTHOP1"
   fi
