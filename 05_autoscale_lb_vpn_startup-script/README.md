@@ -146,7 +146,7 @@ https://docs.usacloud.jp/autoscaler/configuration/#resource_def_server
 
 * オートスケールでソースアーカイブ指定時に tags を利用しても正常に機能しないようです。以下のエラーになりました。  
 `source_archive:` では [<name_or_resource_selector>](https://docs.usacloud.jp/autoscaler/configuration/#resource_selector)のはずなので、tags も本来は機能するはずと思うのですが、不可でした。  
-`※2025/11/11 に確認したところ、修正されていたため、最新の OS に対応するにはタグでの指定をおすすめします。`  
+`※2025/11/11 に確認したところ、修正されていたため、最新の OS に対応するにはタグでの指定の方がよいかもしれません。`  
 
 ```
 ※autoscale.tf内で templatefile に以下を記載
