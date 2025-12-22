@@ -10,7 +10,7 @@ DNS や NTP はあらかじめ設定されています。
 ## 注意事項
 * 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではディスクの暗号化に対応できません。対応する場合、KMSキーを作成し、ディスクの暗号化を行う際に KMSキーのリソースIDを指定する、という処理が必要ですが、まだディスク側に指定方法が実装されていないようです。
 
-* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。VPNルータで連携できるようになりましたが、VPNルータ側にもまだ指定方法が実装されていないようです。
+* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。  
 
 * Windows Server ではディスク修正機能に制限があり、パブリックアーカイブ利用での新規作成時のみ、利用が可能です。  
 https://manual.sakura.ad.jp/cloud/storage/modifydisk/windows.html  

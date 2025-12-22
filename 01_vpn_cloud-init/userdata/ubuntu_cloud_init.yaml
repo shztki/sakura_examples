@@ -1,3 +1,4 @@
+## template: jinja
 #cloud-config
 timezone: Asia/Tokyo
 # ホスト名上書き防止
@@ -17,7 +18,28 @@ packages:
   - nginx
   - stress-ng
 bootcmd:
-  ## netplan を 99-netcfg.yaml に生成（50-cloud-init.yaml は残す）
+  ## 共有セグメント用設定(DHCPでもらって固定する)
+  #- |
+  #  cat <<'EOF' > /etc/netplan/99-netcfg.yaml
+  #  network:
+  #    version: 2
+  #    renderer: networkd
+  #    ethernets:
+  #      ens3:
+  #        dhcp4: false
+  #        dhcp6: false
+  #        addresses:
+  #          - {{ ds.meta_data.Server.Interfaces[0].IPAddress }}/{{ ds.meta_data.Server.Interfaces[0].Switch.Subnet.NetworkMaskLen }}
+  #        nameservers:
+  #          addresses:
+  #          - ${dns1}
+  #          - ${dns2}
+  #        routes:
+  #          - to: default
+  #            via: {{ ds.meta_data.Server.Interfaces[0].Switch.Subnet.DefaultRoute }}
+  #  EOF
+  #  chmod 600 /etc/netplan/99-netcfg.yaml
+  ## 1個めNICでの固定IP設定
   - |
     cat <<'EOF' > /etc/netplan/99-netcfg.yaml
     network:
@@ -38,7 +60,7 @@ bootcmd:
               via: ${defaultgateway}
     EOF
     chmod 600 /etc/netplan/99-netcfg.yaml
-  ## --- 92: ens4 (private) ※GW/DNSなし（必要なら追記） ---
+  ## 2個めNICでの固定IP設定
   #- |
   #  cat <<'EOF' > /etc/netplan/92-ens4.yaml
   #  network:
@@ -52,7 +74,7 @@ bootcmd:
   #          - ${nic2ip}/${nic2cidr}
   #  EOF 
   #  chmod 600 /etc/netplan/92-ens4.yaml
-  ## --- 92: ens4 (private) ※GW/DNSなし（静的ルートあり） ---
+  ## 2個めNICでの固定IP設定（静的ルートあり）
   #- |
   #  cat <<'EOF' > /etc/netplan/92-ens4.yaml
   #  network:
@@ -67,9 +89,9 @@ bootcmd:
   #        routes:
   #          - to: ${vpnnetwork}/${vpncidr}
   #            via: ${vpnnexthop}
-  #  EOF 
+  #  EOF
   #  chmod 600 /etc/netplan/92-ens4.yaml
-  ## --- 91: VIP on lo (/32) ---
+  ## DSR用VIP設定
   - |
     cat <<'EOF' > /etc/netplan/91-vip.yaml
     network:

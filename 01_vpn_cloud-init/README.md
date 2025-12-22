@@ -5,7 +5,7 @@ Rocky/Alma/Ubuntu/Debian に対応しています。
 
 現状さくらのクラウドの cloud-init は network-config に対応していないようで、ネットワークの設定ができないようです。  
 そのため、bootcmd や runcmd を駆使して設定する必要があります。  
-共有セグメントに接続する(DHCPでIPがもらえる)以外の環境では、設定に工夫が必要なので、そちらを盛り込んだものにしています。  
+共有セグメントに接続する(DHCPでIPがもらえるが、固定化必須)環境含め、設定に工夫が必要なので、そちらを盛り込んだものにしています。  
 以下が組み込まれています。  
 (最終的には templatefile を利用して動的に変更できる形にしていますが、コード内でyamlencodeして動的に作成するパターンも参考までにコメントアウトして残しています。ただ更新はしていないため、記載内容は過去の状態のままなので利用する場合は注意)  
 
@@ -13,8 +13,8 @@ Rocky/Alma/Ubuntu/Debian に対応しています。
 * クラウドユーザーへのパスワード設定(SHA512)
 * パッケージアップデート、インストール
 * ホスト名設定
-* 1個目の NIC への静的IPアドレス設定(rocky10だけ初期状態が異なるようなので注意。コネクション名が cloud-init ens3 で接続済み。もしかすると network-config に対応したのかもしれないが未確認)
-* コメントアウト: 2個目の NIC への静的IPアドレス設定およびVPN先へのスタティックルート設定(rocky10だけ初期状態が異なるようなので注意。コネクション名が cloud-init ens4 で接続済み。もしかすると network-config に対応したのかもしれないが未確認)
+* 1個目の NIC への静的IPアドレス設定(alma10/rocky10はこれまでと初期状態が異なるようなので注意。コネクション名やインターフェース名が片方もしくは両方変更になっている)
+* コメントアウト: 2個目の NIC への静的IPアドレス設定およびVPN先へのスタティックルート設定(alma10/rocky10はこれまでと初期状態が異なるようなので注意。コネクション名やインターフェース名が片方もしくは両方変更になっている)
 * DSR型のLB利用時のためのVIP設定とカーネルパラメータ設定
 * NTP設定
 * タイムゾーン変更
@@ -22,7 +22,7 @@ Rocky/Alma/Ubuntu/Debian に対応しています。
 
 
 ## 注意事項
-* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。VPNルータで連携できるようになりましたが、VPNルータ側にもまだ指定方法が実装されていないようです。
+* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。  
 
 
 ## サンプル構成図
@@ -126,7 +126,10 @@ usacloud iaas archive ls --tags os-linux --tags cloud-init
 	* switch01 は使わず、switch02 を作成してください
 	* VPNルータは switch02 との接続に変更してください
 	* ターミナル側の wg0.conf は必要に応じて AllowedIPs を修正してください(variables.tf の方で switch02 を switch01 の CIDR に変えるでも可)
-	* cloud-init の 1個めのNICの設定部分はコメントアウトしてください(DHCPで設定されるため)
+	* cloud-init の 1個めのNICの設定部分を共有セグメント用に変更してください(DHCPで設定されるが、それを固定化することが必須のため注意してください)
+		* https://manual.sakura.ad.jp/cloud/server/dhcp.html
+		* https://manual.sakura.ad.jp/cloud/server/cloud-init.html#metadata
+		* https://qiita.com/kamaya-yuki/items/d86f0d288fed16bb0840
 	* cloud-init 内でコメントにしている設定該当部分を適宜有効にしてください
 	* パケットフィルタを作成してください(filter.tf.disable にしているので、有効化してください)
  1. サーバの 1個目の NIC はルータ＋スイッチに接続し、2個目の NIC に switch02 を接続するパターン

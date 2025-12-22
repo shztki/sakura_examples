@@ -1,6 +1,6 @@
-#data "http" "ip_address" {
-#  url = "https://api.ipify.org/"
-#}
+data "http" "ip_address" {
+  url = "https://api.ipify.org/"
+}
 
 resource "sakuracloud_vpc_router" "vpn_router01" {
   count       = var.vpn_router01["count"]
@@ -135,8 +135,17 @@ resource "sakuracloud_vpc_router" "vpn_router01" {
     direction = "receive"
     expression {
       protocol = "tcp"
-      #source_network      = data.http.ip_address.response_body
       source_network      = var.office_cidr
+      source_port         = ""
+      destination_network = var.switch01["name"]
+      destination_port    = "22"
+      allow               = true
+      logging             = true
+      description         = "desc"
+    }
+    expression {
+      protocol = "tcp"
+      source_network      = data.http.ip_address.response_body
       source_port         = ""
       destination_network = var.switch01["name"]
       destination_port    = "22"

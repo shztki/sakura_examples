@@ -1,3 +1,4 @@
+## template: jinja
 #cloud-config
 timezone: Asia/Tokyo
 # ホスト名上書き防止
@@ -18,20 +19,25 @@ packages:
   - stress-ng
 # --- 起動後処理（順序が重要）---
 bootcmd: 
+  ## 1個めのインターフェース設定
   - nmcli -t -f NAME con show | grep -qx '${connection1_name}' || nmcli con add type ethernet ifname ${if1_name} con-name '${connection1_name}'
+  # 共有セグメント(DHCPでもらって固定する)
+  #- nmcli con mod '${connection1_name}' ipv4.addresses '{{ ds.meta_data.Server.Interfaces[0].IPAddress }}/{{ ds.meta_data.Server.Interfaces[0].Switch.Subnet.NetworkMaskLen }}' ipv4.gateway '{{ ds.meta_data.Server.Interfaces[0].Switch.Subnet.DefaultRoute }}' ipv4.dns '${dns1}, ${dns2}' ipv4.method manual ipv6.method ignore
+  # 共有セグメント以外
   - nmcli con mod '${connection1_name}' ipv4.addresses '${nic1ip}/${nic1cidr}' ipv4.gateway '${defaultgateway}' ipv4.dns '${dns1}, ${dns2}' ipv4.method manual ipv6.method ignore
+  # 反映
   - nmcli con down '${connection1_name}' || true
   - nmcli con up   '${connection1_name}'
   ## 2個めのインターフェース設定
   #- nmcli -t -f NAME con show | grep -qx '${connection2_name}' || nmcli con add type ethernet ifname ${if2_name} con-name '${connection2_name}'
   #- nmcli con mod '${connection2_name}' ipv4.addresses '${nic2ip}/${nic2cidr}' ipv4.method manual ipv4.never-default yes ipv6.method ignore
-  ### --- System eth1 に永続ルートを追加（次ホップは switch02 の VIP） ---
+  ## 2個めのインターフェースに永続ルートを追加
   #- nmcli con mod '${connection2_name}' +ipv4.routes '${vpnnetwork}/${vpncidr} ${vpnnexthop}'
-  ### 反映（down→up が必要）
+  ## 反映
   #- nmcli con down '${connection2_name}' || true
   #- nmcli con up   '${connection2_name}'
   ## DSR: VIP を dummy インターフェースに付与
-  - nmcli connection add type dummy ifname vip01 con-name vip01 ipv4.method manual ipv4.addresses '${vip1}/32' ipv6.method ignore
+  - nmcli -t -f NAME con show | grep -qx 'vip01' || nmcli connection add type dummy ifname vip01 con-name vip01 ipv4.method manual ipv4.addresses '${vip1}/32' ipv6.method ignore
   ## DSR: ARP 抑制を sysctl に設定
   - printf "net.ipv4.conf.all.arp_ignore = 1\nnet.ipv4.conf.all.arp_announce = 2\n" > /etc/sysctl.d/99-arp-dsr.conf
   - sysctl --system || sysctl -p || true

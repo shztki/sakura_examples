@@ -17,7 +17,7 @@ DNS や NTP はあらかじめ設定されています。
 
 
 ## 注意事項
-* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。VPNルータで連携できるようになりましたが、VPNルータ側にもまだ指定方法が実装されていないようです。
+* 2025/9/18 時点で、Terraform(terraform-provider-sakuracloud)ではモニタリングスイートの作成ができません。  
 
 * Ubuntu では、ディスク修正機能により作成される `/etc/netplan/01-netcfg.yaml` のパーミッションが正しくない(600になっていない)ために、スタートアップスクリプトのログ(/root/.sacloud-api/notes/ID.log)には WARNING がでます。  
 

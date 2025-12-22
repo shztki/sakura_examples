@@ -4,12 +4,11 @@ data "http" "ip_address" {
 
 locals {
   allow_ip_address = trimspace(data.http.ip_address.response_body)
-  protocol         = ["tcp", "tcp", "icmp", "udp", "tcp", "udp", "fragment", "ip"]
-  source_network   = [local.allow_ip_address, "", "", "", "", "", "", ""]
-  #source_network   = [var.office_cidr, "", "", "", "", "", "", ""]
-  source_port      = ["", "", "", "", "", "", "", ""]
-  destination_port = ["22", "80", "", "68", "32768-61000", "32768-61000", "", ""] # for linux
-  allow            = [true, true, true, true, true, true, true, false]
+  protocol         = ["tcp", "tcp", "tcp", "icmp", "udp", "tcp", "udp", "fragment", "ip"]
+  source_network   = [var.office_cidr, local.allow_ip_address, "", "", "", "", "", "", ""]
+  source_port      = ["", "", "", "", "", "", "", "", ""]
+  destination_port = ["22", "22", "80", "", "68", "32768-61000", "32768-61000", "", ""] # for linux
+  allow            = [true, true, true, true, true, true, true, true, false]
 }
 
 resource "sakuracloud_packet_filter" "filter01" {

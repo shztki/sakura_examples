@@ -66,6 +66,7 @@ setup_eth1
 function init_loopback() {
   IP=$LOOPBACK_IP
   if [ "$IP" == "" ]; then return 0; fi
+  ip a s | grep -q $IP && return 0;
   nmcli connection add type dummy ifname vip01 ipv4.method manual ipv4.addresses $IP/32 ipv6.method ignore
   grep -q "net.ipv4.conf.all.arp_ignore = 1" /etc/sysctl.conf && return 0;
   echo "net.ipv4.conf.all.arp_ignore = 1" >> /etc/sysctl.conf
