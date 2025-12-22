@@ -38,7 +38,7 @@ variable "disk01" {
     size                 = 100   # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -48,7 +48,7 @@ variable "disk02" {
     size                 = 100   # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -58,7 +58,7 @@ variable "disk03" {
     size                 = 100   # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -68,7 +68,7 @@ variable "disk04" {
     size                 = 100   # min win:100 / linux:20
     plan                 = "ssd" # ssd or hdd
     connector            = "virtio"
-    encryption_algorithm = "none" # none/aes256_xts
+    encryption_algorithm = "aes256_xts" # none/aes256_xts
     memo                 = "example"
   }
 }
@@ -169,3 +169,12 @@ variable "router01" {
     memo        = "example"
   }
 }
+
+variable "kms01" {
+  default = {
+    name = "kms"
+    memo = "example"
+  }
+}
+
+
